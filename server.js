@@ -11,7 +11,7 @@ const RSS_FEEDS = [
     'https://www.lemonde.fr/rss/une.xml',
     'https://www.france24.com/fr/rss',
     'https://news.google.com/rss?hl=fr&gl=FR&ceid=FR:fr',
-    'https://rss.numerama.com/'
+    'https://wired.com/feed/rss'
 ];
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
@@ -158,6 +158,11 @@ app.post('/api/preferences', (req, res) => {
     res.json({ success: true });
 });
 
+// Récupérer l'historique
+app.get('/api/history', (req, res) => {
+    const lessons = JSON.parse(fs.readFileSync(LESSONS_FILE));
+    res.json(lessons);
+});
 
 // Générer de nouvelles leçons personnalisées
 app.post('/api/lesson/generate', async (req, res) => {
