@@ -360,14 +360,18 @@ class TutorApp {
         list.innerHTML = "";
         
         this.history.forEach((item, index) => {
+            const title = this.extractTitle(item.content) || "Leçon sans titre";
             const div = document.createElement('div');
             div.className = 'history-item glass-card clickable';
             div.style.marginBottom = '10px';
             div.style.padding = '15px';
             div.innerHTML = `
                 <div class="history-item-content">
-                    <strong>${item.date}</strong><br>
-                    <small>${item.topics.join(', ')}</small>
+                    <strong style="display: block; margin-bottom: 4px;">${title}</strong>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">
+                        <span>📅 ${item.date}</span> &bull; 
+                        <span>🏷️ ${item.topics.join(', ')}</span>
+                    </div>
                 </div>
                 <div class="history-item-action">📘 Lire</div>
             `;
