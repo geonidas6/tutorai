@@ -59,14 +59,16 @@ app.get('/api/auth/status', (req, res) => {
 
 // Lancer le flux OAuth et tenter de capturer l'URL
 app.get('/api/auth/start', (req, res) => {
-    // On lance 'qwen /auth'. Le CLI attend une interaction (sélection du mode)
-    // On va tenter de forcer le premier choix (OAuth) en envoyant une nouvelle ligne
-    const qwenProcess = spawn('qwen', ['/auth']);
+    // Ajout de --auth-type oauth pour forcer le mode sans interaction (nécessaire en Docker)
+    console.log("Démarrage de l'authentification Qwen...");
+    const qwenProcess = spawn('qwen', ['/auth', '--auth-type', 'oauth']);
     let capturedUrl = '';
     let responseSent = false;
 
     qwenProcess.stdout.on('data', (data) => {
         const output = data.toString();
+        console.log(`Qwen CLI Out: ${output}`);
+        
         // Regex pour capturer une URL Qwen d'activation (ex: https://qwen.ai/auth/device?code=...)
         const urlRegex = /(https?:\/\/qwen\.ai\/auth\/[^\s]+)/g;
         const match = output.match(urlRegex);
@@ -74,11 +76,11 @@ app.get('/api/auth/start', (req, res) => {
         if (match && !responseSent) {
             capturedUrl = match[0];
             responseSent = true;
+            console.log(`URL d'authentification capturée : ${capturedUrl}`);
             res.json({ url: capturedUrl });
-            // On laisse le process tourner un peu pour que l'utilisateur valide
         }
 
-        // On envoie un "Entrée" pour choisir l'option 1 par défaut si le menu apparaît
+        // On envoie un "Entrée" pour choisir l'option 1 par défaut si le menu apparaît (fallback)
         if (output.includes('Select authentication method')) {
             qwenProcess.stdin.write('\n');
         }
@@ -88,13 +90,24 @@ app.get('/api/auth/start', (req, res) => {
         console.error(`CLI Auth Error: ${data}`);
     });
 
+    // Détection de la fin prématurée du processus
+    qwenProcess.on('close', (code) => {
+        if (!responseSent) {
+            responseSent = true;
+            console.error(`Le processus Qwen s'est arrêté prématurément (Code: ${code})`);
+            res.status(500).json({ error: "Le processus d'authentification s'est arrêté sans générer d'URL." });
+        }
+    });
+
     // Timeout de sécurité pour la réponse
     setTimeout(() => {
         if (!responseSent) {
             responseSent = true;
+            qwenProcess.kill();
+            console.error("Timeout de 20s atteint pour l'obtention de l'URL.");
             res.status(408).json({ error: "Délai dépassé pour obtenir l'URL OAuth." });
         }
-    }, 10000);
+    }, 20000); // Augmenté à 20s par sécurité
 });
 
 // Sauvegarder une Clé API manuellement
