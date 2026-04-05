@@ -7,7 +7,6 @@ class TutorApp {
     constructor() {
         this.currentView = 'lesson-view';
         this.preferences = { topics: [] };
-        this.history = [];
         this.selectedTopics = []; // Sujets pour la génération en cours
         
         this.init();
@@ -43,7 +42,7 @@ class TutorApp {
             document.getElementById('auth-overlay').classList.add('hidden');
             await this.loadPreferences();
             await this.loadLesson();
-            await this.loadHistory();
+
         } catch (err) {
             console.error("Erreur de vérification d'auth", err);
         }
@@ -194,7 +193,7 @@ class TutorApp {
             
             // On recharge tout
             await this.loadPreferences();
-            await this.loadHistory();
+
             
             // On affiche la dernière leçon générée
             loader.classList.add('hidden');
@@ -239,7 +238,7 @@ class TutorApp {
             }
 
             alert(`Nouvelle leçon générée sur l'actualité !`);
-            await this.loadHistory();
+
             
             loader.classList.add('hidden');
             header.classList.remove('hidden');
@@ -353,58 +352,6 @@ class TutorApp {
         this.renderTopics();
     }
 
-    async loadHistory() {
-        const resp = await fetch('/api/history');
-        this.history = await resp.json();
-        const list = document.getElementById('history-list');
-        list.innerHTML = "";
-        
-        this.history.forEach((item, index) => {
-            const title = this.extractTitle(item.content) || "Leçon sans titre";
-            const div = document.createElement('div');
-            div.className = 'history-item glass-card clickable';
-            div.style.marginBottom = '10px';
-            div.style.padding = '15px';
-            div.innerHTML = `
-                <div class="history-item-content">
-                    <strong style="display: block; margin-bottom: 4px;">${title}</strong>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">
-                        <span>📅 ${item.date}</span> &bull; 
-                        <span>🏷️ ${item.topics.join(', ')}</span>
-                    </div>
-                </div>
-                <div class="history-item-action">📘 Lire</div>
-            `;
-            div.onclick = () => this.showLessonFromHistory(index);
-            list.appendChild(div);
-        });
-    }
-
-    /**
-     * Affiche une leçon spécifique de l'historique
-     */
-    showLessonFromHistory(index) {
-        const lesson = this.history[index];
-        if (!lesson) return;
-
-        const body = document.getElementById('lesson-body');
-        const header = document.getElementById('lesson-header');
-        const footer = document.getElementById('lesson-footer');
-        const loader = document.getElementById('lesson-loader');
-
-        loader.classList.add('hidden');
-        header.classList.remove('hidden');
-        footer.classList.remove('hidden');
-
-        document.getElementById('lesson-title').innerText = this.extractTitle(lesson.content) || "Archive";
-        document.getElementById('lesson-date').innerText = lesson.date;
-        body.innerHTML = this.parseMarkdown(lesson.content);
-        
-        this.switchView('lesson-view');
-        
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
 
     /**
      * Lance le flux OAuth
