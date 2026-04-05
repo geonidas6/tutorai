@@ -433,3 +433,37 @@ blockquote {
     color: var(--text-muted);
 }
 
+/* History Interactions */
+.history-item.clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--card-border);
+}
+
+.history-item.clickable:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+    box-shadow: 0 5px 15px rgba(138, 43, 226, 0.1);
+    background: #fff;
+}
+
+.history-item-action {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.2s ease;
+}
+
+.history-item.clickable:hover .history-item-action {
+    opacity: 1;
+    transform: translateX(0);
+}
+
