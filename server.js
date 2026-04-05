@@ -59,9 +59,9 @@ app.get('/api/auth/status', (req, res) => {
 
 // Lancer le flux OAuth et tenter de capturer l'URL
 app.get('/api/auth/start', (req, res) => {
-    // Ajout de --auth-type oauth pour forcer le mode sans interaction (nécessaire en Docker)
+    // Correction : Utilisation du type exact 'qwen-oauth' et de la commande 'auth'
     console.log("Démarrage de l'authentification Qwen...");
-    const qwenProcess = spawn('qwen', ['/auth', '--auth-type', 'oauth']);
+    const qwenProcess = spawn('qwen', ['auth', '--auth-type', 'qwen-oauth']);
     let capturedUrl = '';
     let responseSent = false;
 
