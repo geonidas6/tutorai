@@ -195,9 +195,12 @@ class TutorApp {
             const data = await resp.json();
 
             if (data.url) {
-                status.innerText = "Lien généré avec succès !";
+                status.innerText = "Lien généré ! Ouverture de la page d'autorisation... 🚀";
                 link.href = data.url;
                 linkContainer.classList.remove('hidden');
+                
+                // Ouverte automatique de l'URL dans un nouvel onglet
+                window.open(data.url, '_blank');
                 
                 // On poll toutes les 5 secondes pour voir si l'auth est réussie
                 this.pollAuthStatus();

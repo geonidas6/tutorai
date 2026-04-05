@@ -65,18 +65,20 @@ app.get('/api/auth/start', (req, res) => {
     let capturedUrl = '';
     let responseSent = false;
 
-    qwenProcess.stdout.on('data', (data) => {
+    const handleData = (data, isError = false) => {
         const output = data.toString();
-        console.log(`Qwen CLI Out: ${output}`);
+        // Loggez tout pour voir ce qui arrive (utile pour le débug via docker logs)
+        if (isError) console.log(`Qwen CLI Error Out: ${output}`);
+        else console.log(`Qwen CLI Out: ${output}`);
         
-        // Regex pour capturer une URL Qwen d'activation (ex: https://qwen.ai/auth/device?code=...)
-        const urlRegex = /(https?:\/\/qwen\.ai\/auth\/[^\s]+)/g;
+        // Regex plus flexible pour Qwen (chat.qwen.ai ou qwen.ai)
+        const urlRegex = /(https?:\/\/[^\s]*qwen\.ai\/[^\s]+)/g;
         const match = output.match(urlRegex);
         
         if (match && !responseSent) {
             capturedUrl = match[0];
             responseSent = true;
-            console.log(`URL d'authentification capturée : ${capturedUrl}`);
+            console.log(`URL d'authentification capturée via ${isError ? 'stderr' : 'stdout'} : ${capturedUrl}`);
             res.json({ url: capturedUrl });
         }
 
@@ -84,11 +86,10 @@ app.get('/api/auth/start', (req, res) => {
         if (output.includes('Select authentication method')) {
             qwenProcess.stdin.write('\n');
         }
-    });
+    };
 
-    qwenProcess.stderr.on('data', (data) => {
-        console.error(`CLI Auth Error: ${data}`);
-    });
+    qwenProcess.stdout.on('data', (data) => handleData(data, false));
+    qwenProcess.stderr.on('data', (data) => handleData(data, true));
 
     // Détection de la fin prématurée du processus
     qwenProcess.on('close', (code) => {
@@ -104,10 +105,10 @@ app.get('/api/auth/start', (req, res) => {
         if (!responseSent) {
             responseSent = true;
             qwenProcess.kill();
-            console.error("Timeout de 20s atteint pour l'obtention de l'URL.");
+            console.error("Timeout de 30s atteint pour l'obtention de l'URL.");
             res.status(408).json({ error: "Délai dépassé pour obtenir l'URL OAuth." });
         }
-    }, 20000); // Augmenté à 20s par sécurité
+    }, 30000); // Maintenu à 30s par sécurité
 });
 
 // Sauvegarder une Clé API manuellement
