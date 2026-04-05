@@ -12,6 +12,37 @@
     --nav-height: 80px;
 }
 
+.glass-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#header-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    box-shadow: var(--accent-glow);
+}
+
+#logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+#logo span {
+    color: var(--primary-color);
+}
+
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -34,8 +65,8 @@ body {
     max-width: 500px;
     margin: 0 auto;
     padding: 20px;
-    padding-bottom: calc(var(--nav-height) + 20px);
-    height: 100vh;
+    padding-bottom: calc(var(--nav-height) + 40px);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -277,3 +308,49 @@ body {
 }
 
 .hidden { display: none; }
+
+/* Custom Generation Form */
+.gen-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 1px solid var(--card-border);
+}
+
+.gen-controls input[type="text"] {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--card-border);
+    padding: 12px;
+    border-radius: 12px;
+    color: white;
+    width: 100%;
+}
+
+.gen-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.gen-row label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.gen-row input[type="number"] {
+    width: 60px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--card-border);
+    padding: 8px;
+    border-radius: 8px;
+    color: white;
+    text-align: center;
+}
+
+.gen-row button {
+    flex: 1;
+}
+

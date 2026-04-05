@@ -61,7 +61,7 @@ app.get('/api/auth/status', (req, res) => {
 app.get('/api/auth/start', (req, res) => {
     // Correction : Utilisation du type exact 'qwen-oauth' et de la commande 'auth'
     console.log("Démarrage de l'authentification Qwen...");
-    const qwenProcess = spawn('qwen', ['auth', '--auth-type', 'qwen-oauth']);
+    const qwenProcess = spawn('qwen', ['auth', 'qwen-oauth']);
     let capturedUrl = '';
     let responseSent = false;
 
@@ -156,7 +156,53 @@ app.get('/api/history', (req, res) => {
     res.json(lessons);
 });
 
-// Demander la leçon du jour
+// Générer de nouvelles leçons personnalisées
+app.post('/api/lesson/generate', async (req, res) => {
+    try {
+        const { topic, count } = req.body;
+        const numLessons = parseInt(count) || 1;
+        const lessons = JSON.parse(fs.readFileSync(LESSONS_FILE));
+        const today = new Date().toISOString().split('T')[0];
+
+        const generatedLessons = [];
+
+        for (let i = 0; i < numLessons; i++) {
+            console.log(`Génération de la leçon ${i + 1}/${numLessons} sur le sujet : ${topic}`);
+            
+            const prompt = `Agis en tant que tuteur expert. Enseigne moi quelque chose de nouveau et de fascinant sur ce sujet spécifique : ${topic}. 
+            Format de réponse impératif :
+            # [Titre de la leçon]
+            ## Introduction 
+            [Présentation du concept]
+            ## Ce qu'il faut retenir
+            [Explications claires en plusieurs points]
+            ## Anecdote fascinante
+            [Un fait peu connu pour briller en société]
+            
+            Réponds en français uniquement. Sois concis, structuré et passionnant.`;
+
+            const content = await runQwen(prompt);
+            
+            const newLesson = {
+                date: today,
+                content: content,
+                topics: [topic],
+                custom: true
+            };
+            
+            generatedLessons.push(newLesson);
+            lessons.unshift(newLesson);
+        }
+
+        fs.writeFileSync(LESSONS_FILE, JSON.stringify(lessons, null, 2));
+        res.json({ success: true, count: numLessons, lastLesson: generatedLessons[0] });
+    } catch (error) {
+        console.error("Erreur génération personnalisée:", error);
+        res.status(500).json({ error: "Erreur lors de la génération : " + error });
+    }
+});
+
+// Demander la leçon du jour (fallback automatique)
 app.get('/api/lesson', async (req, res) => {
     try {
         const today = new Date().toISOString().split('T')[0];

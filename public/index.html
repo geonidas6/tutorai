@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TutorAI | Votre dose quotidienne de savoir</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8a2be2">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="style.css">
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,8 +49,11 @@
 
     <div id="app">
         <header class="glass-header">
-            <h1 id="logo">Tutor<span>AI</span></h1>
-            <div id="streak-counter">🔥 <span id="streak-val">3</span> Jours</div>
+            <div class="logo-container">
+                <img src="logo.png" alt="TutorAI Logo" id="header-logo">
+                <h1 id="logo">Tutor<span>AI</span></h1>
+            </div>
+            <div id="streak-counter">🔥 <span id="streak-val">0</span> Jours</div>
         </header>
 
         <main id="content">
@@ -60,7 +69,14 @@
                         <!-- Le contenu Markdown sera inséré ici -->
                     </div>
                     <div id="lesson-footer" class="hidden">
-                        <button id="solve-quiz" class="btn-primary">Répondre au Quiz</button>
+                        <div class="gen-controls">
+                            <input type="text" id="gen-topic" placeholder="Sujet spécifique (ex: Trous Noirs)">
+                            <div class="gen-row">
+                                <label for="gen-count">Nombre :</label>
+                                <input type="number" id="gen-count" value="1" min="1" max="5">
+                                <button id="btn-generate" class="btn-primary">Générer 🚀</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

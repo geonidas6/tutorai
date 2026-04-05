@@ -15,6 +15,18 @@ class TutorApp {
     async init() {
         this.bindEvents();
         await this.checkAuth();
+        this.registerSW();
+    }
+
+    async registerSW() {
+        if ('serviceWorker' in navigator) {
+            try {
+                await navigator.serviceWorker.register('/sw.js');
+                console.log("Service Worker enregistré avec succès !");
+            } catch (err) {
+                console.error("Échec de l'enregistrement du Service Worker", err);
+            }
+        }
     }
 
     async checkAuth() {
@@ -64,6 +76,11 @@ class TutorApp {
         document.getElementById('save-config').addEventListener('click', () => {
             this.savePreferences();
         });
+
+        // Générer de nouveaux cours
+        document.getElementById('btn-generate').addEventListener('click', () => {
+            this.handleGeneration();
+        });
     }
 
     /**
@@ -112,6 +129,69 @@ class TutorApp {
             
         } catch (err) {
             body.innerHTML = `<p class="error">Impossible de joindre le serveur. Assurez-vous que Docker est bien lancé.</p>`;
+        }
+    }
+
+    async handleGeneration() {
+        const topic = document.getElementById('gen-topic').value.trim();
+        const count = document.getElementById('gen-count').value;
+        const btn = document.getElementById('btn-generate');
+        const loader = document.getElementById('lesson-loader');
+        const header = document.getElementById('lesson-header');
+        const body = document.getElementById('lesson-body');
+        const footer = document.getElementById('lesson-footer');
+
+        if (!topic) {
+            alert("Veuillez entrer un sujet précis.");
+            return;
+        }
+
+        // UI Loading
+        btn.disabled = true;
+        btn.innerText = "Génération... ⏳";
+        loader.classList.remove('hidden');
+        loader.innerText = `Qwen génère ${count > 1 ? count + ' leçons' : 'votre leçon'} sur "${topic}"... Cela peut prendre une minute. 🤖`;
+        header.classList.add('hidden');
+        body.innerHTML = "";
+        footer.classList.add('hidden');
+
+        try {
+            const resp = await fetch('/api/lesson/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, count })
+            });
+
+            const data = await resp.json();
+
+            if (data.error) {
+                alert("Erreur: " + data.error);
+                this.loadLesson(); // Reload default
+                return;
+            }
+
+            // Success
+            alert(`${data.count} leçon(s) générée(s) avec succès !`);
+            
+            // On recharge tout
+            await this.loadPreferences();
+            await this.loadHistory();
+            
+            // On affiche la dernière leçon générée
+            loader.classList.add('hidden');
+            header.classList.remove('hidden');
+            footer.classList.remove('hidden');
+            document.getElementById('lesson-title').innerText = this.extractTitle(data.lastLesson.content) || "Nouvelle Leçon";
+            body.innerHTML = this.parseMarkdown(data.lastLesson.content);
+            this.switchView('lesson-view');
+
+        } catch (err) {
+            console.error("Erreur de génération", err);
+            alert("Erreur de communication avec le serveur.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Génération 🚀";
+            loader.innerText = "Un instant, Qwen prépare votre leçon... 🤖";
         }
     }
 

@@ -1,0 +1,22 @@
+{
+  "name": "TutorAI",
+  "short_name": "TutorAI",
+  "description": "Votre dose quotidienne de savoir avec Qwen AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d011d",
+  "theme_color": "#8a2be2",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
