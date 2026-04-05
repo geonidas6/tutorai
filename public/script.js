@@ -14,9 +14,26 @@ class TutorApp {
 
     async init() {
         this.bindEvents();
-        await this.loadPreferences();
-        await this.loadLesson();
-        await this.loadHistory();
+        await this.checkAuth();
+    }
+
+    async checkAuth() {
+        try {
+            const resp = await fetch('/api/auth/status');
+            const status = await resp.json();
+            
+            if (!status.authenticated) {
+                document.getElementById('auth-overlay').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('auth-overlay').classList.add('hidden');
+            await this.loadPreferences();
+            await this.loadLesson();
+            await this.loadHistory();
+        } catch (err) {
+            console.error("Erreur de vérification d'auth", err);
+        }
     }
 
     bindEvents() {
@@ -26,6 +43,16 @@ class TutorApp {
                 const targetView = e.currentTarget.dataset.view;
                 this.switchView(targetView);
             });
+        });
+
+        // Connexion OAuth
+        document.getElementById('btn-oauth').addEventListener('click', () => {
+            this.startOAuth();
+        });
+
+        // Sauvegarde Clé API
+        document.getElementById('btn-save-key').addEventListener('click', () => {
+            this.saveApiKey();
         });
 
         // Ajouter un sujet
@@ -149,6 +176,82 @@ class TutorApp {
                 <small>${item.topics.join(', ')}</small>
             </div>
         `).join('');
+    }
+
+    /**
+     * Lance le flux OAuth
+     */
+    async startOAuth() {
+        const status = document.getElementById('auth-status');
+        const linkContainer = document.getElementById('oauth-link-container');
+        const link = document.getElementById('oauth-link');
+
+        status.classList.remove('hidden');
+        status.innerText = "Génération du lien d'activation... ⏳";
+        linkContainer.classList.add('hidden');
+
+        try {
+            const resp = await fetch('/api/auth/start');
+            const data = await resp.json();
+
+            if (data.url) {
+                status.innerText = "Lien généré avec succès !";
+                link.href = data.url;
+                linkContainer.classList.remove('hidden');
+                
+                // On poll toutes les 5 secondes pour voir si l'auth est réussie
+                this.pollAuthStatus();
+            } else {
+                status.innerText = "Échec de génération du lien. Réessayez ou utilisez une clé API.";
+            }
+        } catch (err) {
+            status.innerText = "Erreur de communication avec le serveur.";
+        }
+    }
+
+    /**
+     * Sauvegarde la clé API manuellement
+     */
+    async saveApiKey() {
+        const key = document.getElementById('api-key-input').value.trim();
+        const status = document.getElementById('auth-status');
+        
+        if (!key) return;
+
+        status.classList.remove('hidden');
+        status.innerText = "Validation de la clé... ⏳";
+
+        try {
+            const resp = await fetch('/api/auth/key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ apiKey: key })
+            });
+
+            if (resp.ok) {
+                status.innerText = "Clé validée ! Chargement de l'application...";
+                setTimeout(() => this.checkAuth(), 1500);
+            } else {
+                status.innerText = "Erreur lors de la sauvegarde de la clé.";
+            }
+        } catch (err) {
+            status.innerText = "Erreur serveur.";
+        }
+    }
+
+    /**
+     * Vérifie périodiquement si l'utilisateur a fini l'auth OAuth
+     */
+    pollAuthStatus() {
+        const interval = setInterval(async () => {
+            const resp = await fetch('/api/auth/status');
+            const status = await resp.json();
+            
+            if (status.authenticated) {
+                clearInterval(interval);
+                this.checkAuth();
+            }
+        }, 5000);
     }
 
     /**

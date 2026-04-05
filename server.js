@@ -1,5 +1,5 @@
 const express = require('express');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
@@ -7,8 +7,13 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
+const QWEN_CONFIG_DIR = path.join(process.env.HOME || '/root', '.qwen');
 const LESSONS_FILE = path.join(DATA_DIR, 'lessons.json');
 const PREFS_FILE = path.join(DATA_DIR, 'preferences.json');
+
+// Session/Auth file (cached by qwen CLI)
+const OAUTH_FILE = path.join(QWEN_CONFIG_DIR, 'oauth_creds.json');
+const SETTINGS_FILE = path.join(QWEN_CONFIG_DIR, 'settings.json');
 
 // Initialisation des répertoires
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
@@ -37,6 +42,84 @@ function runQwen(prompt) {
         });
     });
 }
+
+// --- AUTH ROUTES ---
+
+// Vérifier l'état de l'authentification
+app.get('/api/auth/status', (req, res) => {
+    // On vérifie si un fichier de session existe ou si qwen-max est configuré avec une clé
+    const hasOAuth = fs.existsSync(OAUTH_FILE);
+    const hasSettings = fs.existsSync(SETTINGS_FILE);
+    
+    res.json({ 
+        authenticated: hasOAuth || hasSettings,
+        method: hasOAuth ? 'oauth' : (hasSettings ? 'apikey' : 'none')
+    });
+});
+
+// Lancer le flux OAuth et tenter de capturer l'URL
+app.get('/api/auth/start', (req, res) => {
+    // On lance 'qwen /auth'. Le CLI attend une interaction (sélection du mode)
+    // On va tenter de forcer le premier choix (OAuth) en envoyant une nouvelle ligne
+    const qwenProcess = spawn('qwen', ['/auth']);
+    let capturedUrl = '';
+    let responseSent = false;
+
+    qwenProcess.stdout.on('data', (data) => {
+        const output = data.toString();
+        // Regex pour capturer une URL Qwen d'activation (ex: https://qwen.ai/auth/device?code=...)
+        const urlRegex = /(https?:\/\/qwen\.ai\/auth\/[^\s]+)/g;
+        const match = output.match(urlRegex);
+        
+        if (match && !responseSent) {
+            capturedUrl = match[0];
+            responseSent = true;
+            res.json({ url: capturedUrl });
+            // On laisse le process tourner un peu pour que l'utilisateur valide
+        }
+
+        // On envoie un "Entrée" pour choisir l'option 1 par défaut si le menu apparaît
+        if (output.includes('Select authentication method')) {
+            qwenProcess.stdin.write('\n');
+        }
+    });
+
+    qwenProcess.stderr.on('data', (data) => {
+        console.error(`CLI Auth Error: ${data}`);
+    });
+
+    // Timeout de sécurité pour la réponse
+    setTimeout(() => {
+        if (!responseSent) {
+            responseSent = true;
+            res.status(408).json({ error: "Délai dépassé pour obtenir l'URL OAuth." });
+        }
+    }, 10000);
+});
+
+// Sauvegarder une Clé API manuellement
+app.post('/api/auth/key', (req, res) => {
+    const { apiKey } = req.body;
+    if (!apiKey) return res.status(400).json({ error: "Clé manquante" });
+
+    const settings = {
+        modelProviders: {
+            openai: [{
+                id: "qwen-max",
+                name: "Qwen Max via DashScope",
+                baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+                envKey: "DASHSCOPE_API_KEY"
+            }]
+        },
+        env: { DASHSCOPE_API_KEY: apiKey },
+        security: { auth: { selectedType: "openai" } },
+        model: { name: "qwen-max" }
+    };
+
+    if (!fs.existsSync(QWEN_CONFIG_DIR)) fs.mkdirSync(QWEN_CONFIG_DIR, { recursive: true });
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2));
+    res.json({ success: true });
+});
 
 // --- API ROUTES ---
 

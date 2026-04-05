@@ -40,33 +40,73 @@ body {
     flex-direction: column;
 }
 
-/* Header */
-.glass-header {
+/* Auth Overlay */
+.glass-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    z-index: 2000;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 20px 0;
+    padding: 20px;
 }
 
-#logo {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: -1px;
+.auth-card {
+    max-width: 400px;
+    text-align: center;
 }
 
-#logo span {
-    color: #da70d6;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.auth-card h2 { margin-bottom: 10px; }
+.auth-card p { color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem; }
+
+.divider {
+    margin: 25px 0;
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+}
+.divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--card-border);
+    margin: 0 10px;
 }
 
-#streak-counter {
-    background: var(--card-bg);
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 0.9rem;
+.input-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+}
+.input-group-vertical label { font-size: 0.75rem; color: var(--text-muted); }
+.input-group-vertical input {
+    background: rgba(0,0,0,0.3);
     border: 1px solid var(--card-border);
+    padding: 12px;
+    border-radius: 12px;
+    color: white;
+}
+
+.status-msg { margin-top: 15px; font-size: 0.85rem; color: #ffeb3b; }
+.small { font-size: 0.75rem; margin-top: 10px; }
+
+.link-glow {
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--primary-gradient);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: var(--accent-glow);
+    margin: 15px 0;
 }
 
 /* Views */

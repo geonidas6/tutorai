@@ -11,6 +11,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
+    <!-- Overlay d'Authentification -->
+    <div id="auth-overlay" class="glass-overlay hidden">
+        <div class="auth-card glass-card">
+            <h2>Bienvenue sur Tutor<span>AI</span></h2>
+            <p>Connectez votre compte Qwen pour commencer l'aventure.</p>
+            
+            <div class="auth-methods">
+                <button id="btn-oauth" class="btn-primary">
+                    <span class="icon">🚀</span> Se connecter via Qwen OAuth
+                </button>
+                
+                <div class="divider"><span>OU</span></div>
+                
+                <div class="input-group-vertical">
+                    <label for="api-key-input">Utiliser une Clé API DashScope</label>
+                    <input type="password" id="api-key-input" placeholder="sk-...">
+                    <button id="btn-save-key" class="btn-secondary">Valider la clé</button>
+                </div>
+            </div>
+
+            <div id="auth-status" class="status-msg hidden"></div>
+            
+            <div id="oauth-link-container" class="hidden">
+                <p>Cliquez sur le lien ci-dessous pour valider la connexion :</p>
+                <a href="#" id="oauth-link" target="_blank" class="link-glow">Ouvrir le lien d'activation</a>
+                <p class="small">Une fois validé, l'application se débloquera automatiquement.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="app">
         <header class="glass-header">
             <h1 id="logo">Tutor<span>AI</span></h1>
