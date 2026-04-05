@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TutorAI | Votre dose quotidienne de savoir</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div id="app">
+        <header class="glass-header">
+            <h1 id="logo">Tutor<span>AI</span></h1>
+            <div id="streak-counter">🔥 <span id="streak-val">3</span> Jours</div>
+        </header>
+
+        <main id="content">
+            <!-- Section Leçon du Jour -->
+            <section id="lesson-view" class="view active">
+                <div id="lesson-card" class="glass-card">
+                    <div id="lesson-loader" class="loader">Un instant, Qwen prépare votre leçon... 🤖</div>
+                    <div id="lesson-header" class="hidden">
+                        <span id="lesson-date">Aujourd'hui</span>
+                        <h2 id="lesson-title">Leçon en cours...</h2>
+                    </div>
+                    <div id="lesson-body" class="markdown-content">
+                        <!-- Le contenu Markdown sera inséré ici -->
+                    </div>
+                    <div id="lesson-footer" class="hidden">
+                        <button id="solve-quiz" class="btn-primary">Répondre au Quiz</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Configuration -->
+            <section id="settings-view" class="view">
+                <div class="glass-card">
+                    <h3>Mes Centres d'Intérêt</h3>
+                    <p class="subtitle">Sélectionnez les sujets qui vous fascinent.</p>
+                    <div id="topics-grid">
+                        <!-- Généré dynamiquement -->
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="new-topic" placeholder="Ajouter un sujet (ex: Astronomie)">
+                        <button id="add-topic" class="btn-secondary">+</button>
+                    </div>
+                    <button id="save-config" class="btn-primary">Enregistrer mes choix</button>
+                </div>
+            </section>
+
+            <!-- Section Historique -->
+            <section id="history-view" class="view">
+                <div class="glass-card">
+                    <h3>Mes Archives</h3>
+                    <div id="history-list">
+                        <!-- Liste des leçons précédentes -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav id="bottom-nav" class="glass-nav">
+            <button class="nav-item active" data-view="lesson-view">
+                <span class="icon">🎓</span>
+                <span class="label">Leçon</span>
+            </button>
+            <button class="nav-item" data-view="settings-view">
+                <span class="icon">⚙️</span>
+                <span class="label">Paramètres</span>
+            </button>
+            <button class="nav-item" data-view="history-view">
+                <span class="icon">📚</span>
+                <span class="label">Histoire</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js" type="module"></script>
+</body>
+</html>

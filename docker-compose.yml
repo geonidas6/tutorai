@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: tutorai-app
+    restart: unless-stopped
+    # On peut garder le port en local pour le débug si besoin, ou le commenter
+    # ports:
+    #   - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - qwen-config:/root/.qwen
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - DOMAIN=${DOMAIN:-tutorai.local}
+    networks:
+      - proxy_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tutorai.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.tutorai.entrypoints=websecure"
+      - "traefik.http.routers.tutorai.tls.certresolver=myresolver"
+      - "traefik.http.services.tutorai.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy_net"
+
+volumes:
+  qwen-config:
+
+networks:
+  proxy_net:
+    external: true
