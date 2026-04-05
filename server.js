@@ -3,8 +3,16 @@ const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
+const Parser = require('rss-parser');
 
 const app = express();
+const parser = new Parser();
+const RSS_FEEDS = [
+    'https://www.lemonde.fr/rss/une.xml',
+    'https://www.france24.com/fr/rss',
+    'https://news.google.com/rss?hl=fr&gl=FR&ceid=FR:fr',
+    'https://wired.com/feed/rss'
+];
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const QWEN_CONFIG_DIR = path.join(process.env.HOME || '/root', '.qwen');
@@ -169,15 +177,23 @@ app.post('/api/lesson/generate', async (req, res) => {
         for (let i = 0; i < numLessons; i++) {
             console.log(`Génération de la leçon ${i + 1}/${numLessons} sur le sujet : ${topic}`);
             
-            const prompt = `Agis en tant que tuteur expert. Enseigne moi quelque chose de nouveau et de fascinant sur ce sujet spécifique : ${topic}. 
+            const prompt = `Agis en tant que tuteur expert. Enseigne moi quelque chose de nouveau et de fascinant sur ces sujets spécifiques : ${Array.isArray(topic) ? topic.join(', ') : topic}. 
             Format de réponse impératif :
             # [Titre de la leçon]
+            
+            ![Image illustrative](https://source.unsplash.com/featured/?${encodeURIComponent(Array.isArray(topic) ? topic[0] : topic)})
+
             ## Introduction 
             [Présentation du concept]
+            
             ## Ce qu'il faut retenir
             [Explications claires en plusieurs points]
+            
             ## Anecdote fascinante
             [Un fait peu connu pour briller en société]
+
+            ---
+            **Source :** [En savoir plus sur Wikipédia](https://fr.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(Array.isArray(topic) ? topic[0] : topic)})
             
             Réponds en français uniquement. Sois concis, structuré et passionnant.`;
 
@@ -199,6 +215,70 @@ app.post('/api/lesson/generate', async (req, res) => {
     } catch (error) {
         console.error("Erreur génération personnalisée:", error);
         res.status(500).json({ error: "Erreur lors de la génération : " + error });
+    }
+});
+
+// Auto-Générer une leçon basée sur l'actualité du moment (via RSS)
+app.post('/api/lesson/auto-generate', async (req, res) => {
+    try {
+        const lessons = JSON.parse(fs.readFileSync(LESSONS_FILE));
+        const today = new Date().toISOString().split('T')[0];
+        
+        console.log("Auto-Génération via Flux RSS...");
+
+        // 1. Récupérer une news réelle depuis les flux
+        const feedUrl = RSS_FEEDS[Math.floor(Math.random() * RSS_FEEDS.length)];
+        const feed = await parser.parseURL(feedUrl);
+        const item = feed.items[0]; // On prend le dernier item (le plus frais)
+        
+        if (!item) throw new Error("Impossible de récupérer un flux RSS valide.");
+
+        console.log(`News source : ${item.title}`);
+
+        const prompt = `Agis en tant que tuteur expert et journaliste. 
+        En te basant sur cette actualité réelle et récente ISSUE D'UN FLUX RSS :
+        TITRE : ${item.title}
+        DESCRIPTION : ${item.contentSnippet || item.content || 'Pas de description'}
+        LIEN SOURCE : ${item.link}
+
+        1. Analyse cette information et génère une leçon passionnante dessus.
+        2. Format de réponse impératif :
+        # [Titre de l'Actualité Marquante]
+        
+        ![Image de l'actualité](https://source.unsplash.com/featured/?${encodeURIComponent(item.title)})
+
+        ## L'info du moment
+        [Explique ce qui se passe et pourquoi c'est important]
+        
+        ## Ce qu'il faut comprendre
+        [Détaille les concepts clés derrière cette news]
+        
+        ## Pourquoi ça change tout
+        [L'impact futur de cette découverte ou cet événement]
+        
+        ---
+        **Source :** [Lire l'article complet](${item.link})
+
+        Réponds en français uniquement. Sois captivant et informatif.`;
+
+        const content = await runQwen(prompt);
+        
+        const newLesson = {
+            date: today,
+            content: content,
+            topics: ['Actualités', 'RSS'],
+            sourceLink: item.link,
+            custom: true,
+            auto: true
+        };
+        
+        lessons.unshift(newLesson);
+        fs.writeFileSync(LESSONS_FILE, JSON.stringify(lessons, null, 2));
+        
+        res.json({ success: true, lesson: newLesson });
+    } catch (error) {
+        console.error("Erreur auto-génération RSS:", error);
+        res.status(500).json({ error: "Erreur lors de l'auto-génération RSS : " + error.message });
     }
 });
 

@@ -8,6 +8,7 @@ class TutorApp {
         this.currentView = 'lesson-view';
         this.preferences = { topics: [] };
         this.history = [];
+        this.selectedTopics = []; // Sujets pour la génération en cours
         
         this.init();
     }
@@ -77,6 +78,21 @@ class TutorApp {
             this.savePreferences();
         });
 
+        // Ajouter un sujet à la sélection via le bouton +
+        document.getElementById('btn-add-topic').addEventListener('click', () => {
+            this.addSelectedTopic();
+        });
+
+        // Entrée dans le champ sujet
+        document.getElementById('gen-topic').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.addSelectedTopic();
+        });
+
+        // Auto-Génération
+        document.getElementById('btn-auto-gen').addEventListener('click', () => {
+            this.handleAutoGeneration();
+        });
+
         // Générer de nouveaux cours
         document.getElementById('btn-generate').addEventListener('click', () => {
             this.handleGeneration();
@@ -141,16 +157,19 @@ class TutorApp {
         const body = document.getElementById('lesson-body');
         const footer = document.getElementById('lesson-footer');
 
-        if (!topic) {
-            alert("Veuillez entrer un sujet précis.");
+        if (this.selectedTopics.length === 0 && !topic) {
+            alert("Veuillez entrer ou sélectionner au moins un sujet.");
             return;
         }
+
+        const finalTopics = [...this.selectedTopics];
+        if (topic) finalTopics.push(topic);
 
         // UI Loading
         btn.disabled = true;
         btn.innerText = "Génération... ⏳";
         loader.classList.remove('hidden');
-        loader.innerText = `Qwen génère ${count > 1 ? count + ' leçons' : 'votre leçon'} sur "${topic}"... Cela peut prendre une minute. 🤖`;
+        loader.innerText = `Qwen génère ${count > 1 ? count + ' leçons' : 'votre leçon'} sur "${finalTopics.join(', ')}"... 🤖`;
         header.classList.add('hidden');
         body.innerHTML = "";
         footer.classList.add('hidden');
@@ -159,7 +178,7 @@ class TutorApp {
             const resp = await fetch('/api/lesson/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic, count })
+                body: JSON.stringify({ topic: finalTopics, count })
             });
 
             const data = await resp.json();
@@ -194,6 +213,48 @@ class TutorApp {
             loader.innerText = "Un instant, Qwen prépare votre leçon... 🤖";
         }
     }
+    async handleAutoGeneration() {
+        const btn = document.getElementById('btn-auto-gen');
+        const loader = document.getElementById('lesson-loader');
+        const header = document.getElementById('lesson-header');
+        const body = document.getElementById('lesson-body');
+        const footer = document.getElementById('lesson-footer');
+
+        btn.disabled = true;
+        btn.innerText = "Recherche d'actu... 📡";
+        loader.classList.remove('hidden');
+        loader.innerText = "Qwen scanne les actualités mondiales du jour pour vous... 🔎";
+        header.classList.add('hidden');
+        body.innerHTML = "";
+        footer.classList.add('hidden');
+
+        try {
+            const resp = await fetch('/api/lesson/auto-generate', { method: 'POST' });
+            const data = await resp.json();
+
+            if (data.error) {
+                alert("Erreur: " + data.error);
+                this.loadLesson();
+                return;
+            }
+
+            alert(`Nouvelle leçon générée sur l'actualité !`);
+            await this.loadHistory();
+            
+            loader.classList.add('hidden');
+            header.classList.remove('hidden');
+            footer.classList.remove('hidden');
+            document.getElementById('lesson-title').innerText = this.extractTitle(data.lesson.content) || "Actualité du Jour";
+            body.innerHTML = this.parseMarkdown(data.lesson.content);
+            this.switchView('lesson-view');
+
+        } catch (err) {
+            console.error("Erreur auto-génération", err);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Auto-Génération ✨";
+        }
+    }
 
     /**
      * Charge les préférences utilisateur
@@ -202,6 +263,14 @@ class TutorApp {
         const resp = await fetch('/api/preferences');
         this.preferences = await resp.json();
         this.renderTopics();
+        this.renderDatalist();
+    }
+
+    renderDatalist() {
+        const datalist = document.getElementById('prefs-topics');
+        datalist.innerHTML = this.preferences.topics
+            .map(t => `<option value="${t}"></option>`)
+            .join('');
     }
 
     /**
@@ -238,7 +307,45 @@ class TutorApp {
             this.preferences.topics.push(val);
             input.value = "";
             this.renderTopics();
+            this.renderDatalist();
         }
+    }
+
+    addSelectedTopic() {
+        const input = document.getElementById('gen-topic');
+        const val = input.value.trim();
+        if (val && !this.selectedTopics.includes(val)) {
+            this.selectedTopics.push(val);
+            input.value = "";
+            this.renderSelectedTopics();
+            
+            // On l'ajoute aussi aux préférences si nouveau
+            if (!this.preferences.topics.includes(val)) {
+                this.preferences.topics.push(val);
+                this.savePreferences(false); // Silencieux
+                this.renderDatalist();
+            }
+        }
+    }
+
+    renderSelectedTopics() {
+        const container = document.getElementById('selected-topics-container');
+        container.innerHTML = "";
+        this.selectedTopics.forEach(topic => {
+            const pill = document.createElement('div');
+            pill.className = 'pill';
+            pill.innerHTML = `
+                <span>${topic}</span>
+                <span class="remove-pill">&times;</span>
+            `;
+            pill.querySelector('.remove-pill').onclick = () => this.removeSelectedTopic(topic);
+            container.appendChild(pill);
+        });
+    }
+
+    removeSelectedTopic(topic) {
+        this.selectedTopics = this.selectedTopics.filter(t => t !== topic);
+        this.renderSelectedTopics();
     }
 
     removeTopic(topic) {
@@ -346,6 +453,8 @@ class TutorApp {
             .replace(/^## (.*$)/gim, '<h4>$1</h4>')
             .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>')
             .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+            .replace(/\!\[(.*?)\]\((.*?)\)/gim, '<img src="$2" alt="$1" class="lesson-img" onerror="this.style.display=\'none\'">')
+            .replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="$2" target="_blank" class="lesson-link">$1</a>')
             .replace(/\n$/gim, '<br>');
         
         return html;

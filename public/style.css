@@ -1,14 +1,15 @@
 :root {
-    --bg-color: #0d011d;
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --card-border: rgba(255, 255, 255, 0.1);
+    --bg-color: #fcfaff;
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --card-border: rgba(0, 0, 0, 0.06);
     --primary-color: #8a2be2;
     --primary-gradient: linear-gradient(135deg, #8a2be2 0%, #da70d6 100%);
-    --secondary-color: #4a4a4a;
-    --text-color: #ffffff;
-    --text-muted: #b0b0b0;
-    --accent-glow: 0 0 15px rgba(138, 43, 226, 0.3);
-    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --secondary-color: #f0f0f0;
+    --secondary-text: #4a4a4a;
+    --text-color: #1a1a1a;
+    --text-muted: #666666;
+    --accent-glow: 0 4px 15px rgba(138, 43, 226, 0.15);
+    --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
     --nav-height: 80px;
 }
 
@@ -54,8 +55,8 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     background-image: 
-        radial-gradient(circle at 20% 20%, rgba(138, 43, 226, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(218, 112, 214, 0.05) 0%, transparent 40%);
+        radial-gradient(circle at 10% 10%, rgba(138, 43, 226, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(218, 112, 214, 0.03) 0%, transparent 40%);
     background-attachment: fixed;
     min-height: 100vh;
     overflow-x: hidden;
@@ -136,7 +137,7 @@ body {
     text-decoration: none;
     border-radius: 10px;
     font-weight: 600;
-    box-shadow: var(--accent-glow);
+    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
     margin: 15px 0;
 }
 
@@ -158,8 +159,8 @@ body {
 /* Glass Cards */
 .glass-card {
     background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--card-border);
     border-radius: 24px;
     padding: 24px;
@@ -189,12 +190,12 @@ body {
 
 .markdown-content {
     line-height: 1.6;
-    color: #e0e0e0;
+    color: #333333;
 }
 
-.markdown-content h1, .markdown-content h2 { margin-top: 20px; margin-bottom: 10px; color: #fff; }
+.markdown-content h1, .markdown-content h2 { margin-top: 20px; margin-bottom: 10px; color: #000; }
 .markdown-content p { margin-bottom: 15px; }
-.markdown-content code { background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
+.markdown-content code { background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px; color: var(--primary-color); }
 
 /* Buttons */
 .btn-primary {
@@ -214,11 +215,12 @@ body {
 
 .btn-secondary {
     background: var(--secondary-color);
-    border: none;
-    color: white;
+    border: 1px solid var(--card-border);
+    color: var(--secondary-text);
     padding: 10px 15px;
     border-radius: 10px;
     cursor: pointer;
+    font-weight: 500;
 }
 
 /* Topics Grid */
@@ -231,12 +233,14 @@ body {
 
 .topic-tag {
     padding: 8px 14px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #fff;
+    border: 1px solid var(--card-border);
     border-radius: 10px;
     font-size: 0.85rem;
+    color: var(--secondary-text);
     cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
 
 .topic-tag.active {
@@ -252,11 +256,11 @@ body {
 
 #new-topic {
     flex: 1;
-    background: rgba(0,0,0,0.2);
+    background: #fff;
     border: 1px solid var(--card-border);
     padding: 10px 15px;
     border-radius: 10px;
-    color: white;
+    color: var(--text-color);
 }
 
 /* Bottom Nav */
@@ -268,15 +272,15 @@ body {
     width: calc(100% - 40px);
     max-width: 460px;
     height: var(--nav-height);
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 30px;
     border: 1px solid var(--card-border);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     z-index: 1000;
 }
 
@@ -320,11 +324,11 @@ body {
 }
 
 .gen-controls input[type="text"] {
-    background: rgba(0,0,0,0.3);
+    background: #fff;
     border: 1px solid var(--card-border);
     padding: 12px;
     border-radius: 12px;
-    color: white;
+    color: var(--text-color);
     width: 100%;
 }
 
@@ -342,15 +346,90 @@ body {
 
 .gen-row input[type="number"] {
     width: 60px;
-    background: rgba(0,0,0,0.3);
+    background: #fff;
     border: 1px solid var(--card-border);
     padding: 8px;
     border-radius: 8px;
-    color: white;
+    color: var(--text-color);
     text-align: center;
 }
 
 .gen-row button {
     flex: 1;
+}
+
+/* New Features UI */
+.topics-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(138, 43, 226, 0.1);
+    border: 1px solid rgba(138, 43, 226, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    animation: scaleIn 0.2s ease-out;
+}
+
+.pill .remove-pill {
+    cursor: pointer;
+    font-weight: bold;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.pill .remove-pill:hover { opacity: 1; }
+
+@keyframes scaleIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.accent-glow {
+    background: #fff !important;
+    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.15) !important;
+    border: 1px solid var(--card-border) !important;
+    color: var(--primary-color) !important;
+}
+
+.spacer { flex: 1; }
+
+/* Media Content */
+.lesson-img {
+    width: 100%;
+    border-radius: 16px;
+    margin: 15px 0;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--card-border);
+    max-height: 250px;
+    object-fit: cover;
+}
+
+.lesson-link {
+    color: #da70d6;
+    text-decoration: none;
+    border-bottom: 1px dashed #da70d6;
+    transition: all 0.2s;
+}
+
+.lesson-link:hover {
+    color: #fff;
+    border-bottom-style: solid;
+}
+
+blockquote {
+    border-left: 4px solid var(--primary-color);
+    padding-left: 15px;
+    margin: 15px 0;
+    font-style: italic;
+    color: var(--text-muted);
 }
 

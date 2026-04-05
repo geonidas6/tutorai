@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#8a2be2">
+    <meta name="theme-color" content="#fcfaff">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="style.css">
@@ -70,9 +70,20 @@
                     </div>
                     <div id="lesson-footer" class="hidden">
                         <div class="gen-controls">
-                            <input type="text" id="gen-topic" placeholder="Sujet spécifique (ex: Trous Noirs)">
+                            <div id="selected-topics-container" class="topics-pills">
+                                <!-- Les sujets sélectionnés apparaîtront ici -->
+                            </div>
+                            <div class="input-group">
+                                <input type="text" id="gen-topic" placeholder="Sujet(s) spécifique(s)..." list="prefs-topics">
+                                <datalist id="prefs-topics">
+                                    <!-- Rempli dynamiquement -->
+                                </datalist>
+                                <button id="btn-add-topic" class="btn-secondary">+</button>
+                            </div>
                             <div class="gen-row">
-                                <label for="gen-count">Nombre :</label>
+                                <button id="btn-auto-gen" class="btn-secondary accent-glow">Auto-Génération ✨</button>
+                                <div class="spacer"></div>
+                                <label for="gen-count">Nb :</label>
                                 <input type="number" id="gen-count" value="1" min="1" max="5">
                                 <button id="btn-generate" class="btn-primary">Générer 🚀</button>
                             </div>
