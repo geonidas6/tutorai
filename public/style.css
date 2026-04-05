@@ -433,7 +433,7 @@ blockquote {
     color: var(--text-muted);
 }
 
-/* History Interactions */
+/* History Actions Always Visible */
 .history-item.clickable {
     cursor: pointer;
     transition: all 0.2s ease;
@@ -450,20 +450,40 @@ blockquote {
     background: #fff;
 }
 
-.history-item-action {
+.history-item-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-read {
     background: var(--primary-gradient);
     color: white;
     padding: 6px 12px;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 0.75rem;
     font-weight: 600;
-    opacity: 0;
-    transform: translateX(10px);
-    transition: all 0.2s ease;
 }
 
-.history-item.clickable:hover .history-item-action {
-    opacity: 1;
-    transform: translateX(0);
+.btn-delete {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff4d4d;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid rgba(255, 0, 0, 0.2);
 }
 
+.btn-delete:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
+.delete-text {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+}

@@ -10,8 +10,7 @@ const parser = new Parser();
 const RSS_FEEDS = [
     'https://www.lemonde.fr/rss/une.xml',
     'https://www.france24.com/fr/rss',
-    'https://news.google.com/rss?hl=fr&gl=FR&ceid=FR:fr',
-    'https://wired.com/feed/rss'
+    'https://news.google.com/rss?hl=fr&gl=FR&ceid=FR:fr'
 ];
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
@@ -162,6 +161,24 @@ app.post('/api/preferences', (req, res) => {
 app.get('/api/history', (req, res) => {
     const lessons = JSON.parse(fs.readFileSync(LESSONS_FILE));
     res.json(lessons);
+});
+
+// Supprimer une leçon de l'historique
+app.delete('/api/history/:index', (req, res) => {
+    try {
+        const index = parseInt(req.params.index);
+        const lessons = JSON.parse(fs.readFileSync(LESSONS_FILE));
+        
+        if (index >= 0 && index < lessons.length) {
+            lessons.splice(index, 1);
+            fs.writeFileSync(LESSONS_FILE, JSON.stringify(lessons, null, 2));
+            res.json({ success: true });
+        } else {
+            res.status(404).json({ error: "Leçon non trouvée" });
+        }
+    } catch (error) {
+        res.status(500).json({ error: "Erreur de suppression" });
+    }
 });
 
 // Générer de nouvelles leçons personnalisées

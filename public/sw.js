@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tutorai-v1';
+const CACHE_NAME = 'tutorai-v2';
 const ASSETS = [
   '/',
   '/index.html',

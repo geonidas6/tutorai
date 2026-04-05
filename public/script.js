@@ -1,6 +1,7 @@
 /**
  * TutorAI - Logique Frontend
  * Auteur: Antigravity
+ * Version: 2.0 (DELETION ENABLED)
  */
 
 class TutorApp {
@@ -11,6 +12,7 @@ class TutorApp {
         this.selectedTopics = []; // Sujets pour la génération en cours
         
         this.init();
+        console.log("TutorAI v2.0 - Archive Deletion Active");
     }
 
     async init() {
@@ -22,8 +24,10 @@ class TutorApp {
     async registerSW() {
         if ('serviceWorker' in navigator) {
             try {
-                await navigator.serviceWorker.register('/sw.js');
-                console.log("Service Worker enregistré avec succès !");
+                // Force update on registration
+                const registration = await navigator.serviceWorker.register('/sw.js?v=2');
+                registration.update();
+                console.log("Service Worker enregistré (v2) !");
             } catch (err) {
                 console.error("Échec de l'enregistrement du Service Worker", err);
             }
@@ -110,6 +114,10 @@ class TutorApp {
             document.getElementById(viewId).classList.add('active');
             document.querySelector(`[data-view="${viewId}"]`).classList.add('active');
             this.currentView = viewId;
+            
+            if (viewId === 'history-view') {
+                this.loadHistory();
+            }
         });
     }
 
@@ -373,11 +381,50 @@ class TutorApp {
                         <span>🏷️ ${item.topics.join(', ')}</span>
                     </div>
                 </div>
-                <div class="history-item-action">📘 Lire</div>
+                <div class="history-item-actions">
+                    <div class="btn-read">📘 Lire</div>
+                    <div class="btn-delete" title="Supprimer">🗑️ <span class="delete-text">SUPPRIMER</span></div>
+                </div>
             `;
+            
+            // Clic sur bouton Lire
+            div.querySelector('.btn-read').onclick = (e) => {
+                e.stopPropagation();
+                this.showLessonFromHistory(index);
+            };
+
+            // Clic sur bouton Supprimer
+            div.querySelector('.btn-delete').onclick = (e) => {
+                e.stopPropagation();
+                this.deleteLesson(index);
+            };
+
+            // Clic par défaut sur toute la carte pour lire
             div.onclick = () => this.showLessonFromHistory(index);
+            
             list.appendChild(div);
         });
+    }
+
+    /**
+     * Supprime une leçon de l'historique
+     */
+    async deleteLesson(index) {
+        if (!confirm("Voulez-vous vraiment supprimer cette leçon de vos archives ?")) {
+            return;
+        }
+
+        try {
+            const resp = await fetch(`/api/history/${index}`, { method: 'DELETE' });
+            if (resp.ok) {
+                await this.loadHistory();
+            } else {
+                alert("Erreur lors de la suppression. Statut: " + resp.status);
+            }
+        } catch (err) {
+            console.error("Erreur suppression", err);
+            alert("Erreur de communication avec le serveur.");
+        }
     }
 
     /**
