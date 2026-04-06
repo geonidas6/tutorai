@@ -12,7 +12,7 @@ RUN npm install -g @qwen-code/qwen-code@latest
 # Prepare app directory
 WORKDIR /app
 
-# Copy package files (we will create them next)
+# Copy package files
 COPY package.json ./
 
 # Install app dependencies
@@ -26,6 +26,10 @@ RUN mkdir -p /root/.qwen
 
 # Expose the app port
 EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
 
 # Start the server
 CMD ["npm", "start"]

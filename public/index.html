@@ -53,7 +53,10 @@
                 <img src="logo.png" alt="TutorAI Logo" id="header-logo">
                 <h1 id="logo">Tutor<span>AI</span></h1>
             </div>
-            <div id="streak-counter">🔥 <span id="streak-val">0</span> Jours</div>
+            <div class="header-actions">
+                <div id="streak-counter">🔥 <span id="streak-val">0</span> J</div>
+                <button id="theme-toggle" title="Basculer le thème">🌙</button>
+            </div>
         </header>
 
         <main id="content">
@@ -62,16 +65,33 @@
                 <div id="lesson-card" class="glass-card">
                     <div id="lesson-loader" class="loader">Un instant, Qwen prépare votre leçon... 🤖</div>
                     <div id="lesson-header" class="hidden">
-                        <span id="lesson-date">Aujourd'hui</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                            <span id="lesson-date">Aujourd'hui</span>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span id="lesson-difficulty" class="difficulty-badge"></span>
+                                <button id="fav-toggle" class="fav-btn" title="Ajouter aux favoris">☆</button>
+                                <button id="export-lesson" class="export-btn" title="Exporter">📋 Exporter</button>
+                            </div>
+                        </div>
                         <h2 id="lesson-title">Leçon en cours...</h2>
                     </div>
                     <div id="lesson-body" class="markdown-content">
                         <!-- Le contenu Markdown sera inséré ici -->
                     </div>
+                    <div id="quiz-section" class="quiz-container hidden">
+                        <div id="quiz-question" class="quiz-question"></div>
+                        <div id="quiz-options" class="quiz-options"></div>
+                        <div id="quiz-result" class="quiz-result hidden"></div>
+                    </div>
                     <div id="lesson-footer" class="hidden">
                         <div class="gen-controls">
                             <div id="selected-topics-container" class="topics-pills">
                                 <!-- Les sujets sélectionnés apparaîtront ici -->
+                            </div>
+                            <div class="difficulty-selector">
+                                <div class="diff-option" data-diff="débutant">🌱 Débutant</div>
+                                <div class="diff-option selected" data-diff="intermédiaire">📘 Inter.</div>
+                                <div class="diff-option" data-diff="avancé">🔥 Avancé</div>
                             </div>
                             <div class="input-group">
                                 <input type="text" id="gen-topic" placeholder="Sujet(s) spécifique(s)..." list="prefs-topics">
@@ -104,7 +124,24 @@
                         <input type="text" id="new-topic" placeholder="Ajouter un sujet (ex: Astronomie)">
                         <button id="add-topic" class="btn-secondary">+</button>
                     </div>
-                    <button id="save-config" class="btn-primary">Enregistrer mes choix</button>
+
+                    <h3 style="margin-top: 25px;">Niveau de Difficulté</h3>
+                    <p class="subtitle">Choisissez votre niveau par défaut.</p>
+                    <div class="difficulty-selector" id="settings-difficulty">
+                        <div class="diff-option" data-diff="débutant">🌱 Débutant</div>
+                        <div class="diff-option" data-diff="intermédiaire">📘 Intermédiaire</div>
+                        <div class="diff-option" data-diff="avancé">🔥 Avancé</div>
+                    </div>
+
+                    <h3 style="margin-top: 25px;">Flux RSS Personnalisés</h3>
+                    <p class="subtitle">Ajoutez vos propres sources d'actualités.</p>
+                    <div class="input-group">
+                        <input type="url" id="new-rss-feed" placeholder="https://example.com/feed.xml">
+                        <button id="add-rss-feed" class="btn-secondary">+</button>
+                    </div>
+                    <div id="rss-feeds-list" class="rss-feed-list"></div>
+
+                    <button id="save-config" class="btn-primary" style="margin-top: 20px;">Enregistrer mes choix</button>
                 </div>
             </section>
 
@@ -112,6 +149,11 @@
             <section id="history-view" class="view">
                 <div class="glass-card">
                     <h3>Mes Archives</h3>
+                    <input type="text" id="history-search" class="search-bar" placeholder="🔍 Rechercher une leçon...">
+                    <div class="filter-pills" id="history-filters">
+                        <div class="filter-pill active" data-filter="all">Toutes</div>
+                        <div class="filter-pill" data-filter="favorites">⭐ Favoris</div>
+                    </div>
                     <div id="history-list">
                         <!-- Liste des leçons précédentes -->
                     </div>

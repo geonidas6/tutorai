@@ -13,6 +13,110 @@
     --nav-height: 80px;
 }
 
+/* Light theme (default above) — Dark theme overrides */
+body.dark-theme {
+    --bg-color: #121212;
+    --card-bg: rgba(30, 30, 30, 0.85);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --secondary-color: #2a2a2a;
+    --secondary-text: #e0e0e0;
+    --text-color: #f0f0f0;
+    --text-muted: #aaaaaa;
+    --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-theme .glass-nav {
+    background: rgba(30, 30, 30, 0.85);
+}
+
+body.dark-theme .topic-tag {
+    background: #2a2a2a;
+    color: #e0e0e0;
+}
+
+body.dark-theme .input-group input,
+body.dark-theme .gen-controls input[type="text"],
+body.dark-theme .gen-row input[type="number"],
+body.dark-theme #new-topic,
+body.dark-theme #gen-topic {
+    background: #2a2a2a;
+    color: #f0f0f0;
+}
+
+body.dark-theme .markdown-content {
+    color: #e0e0e0;
+}
+
+body.dark-theme .markdown-content h1,
+body.dark-theme .markdown-content h2 {
+    color: #fff;
+}
+
+body.dark-theme .markdown-content code {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme blockquote {
+    color: #aaaaaa;
+}
+
+body.dark-theme .history-item.clickable:hover {
+    background: #2a2a2a;
+}
+
+body.dark-theme .pill {
+    background: rgba(138, 43, 226, 0.2);
+}
+
+body.dark-theme .history-item-actions .btn-delete {
+    background: rgba(255, 77, 77, 0.15);
+}
+
+body.dark-theme .search-bar {
+    background: #2a2a2a;
+    color: #f0f0f0;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-theme .quiz-container {
+    background: rgba(138, 43, 226, 0.1);
+    border-color: rgba(138, 43, 226, 0.2);
+}
+
+body.dark-theme .quiz-option {
+    background: #2a2a2a;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f0f0f0;
+}
+
+body.dark-theme .quiz-option:hover {
+    background: #3a3a3a;
+}
+
+body.dark-theme .quiz-option.correct {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: #4caf50;
+}
+
+body.dark-theme .quiz-option.incorrect {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: #f44336;
+}
+
+body.dark-theme .export-btn {
+    background: rgba(138, 43, 226, 0.15);
+    color: #da70d6;
+}
+
+body.dark-theme .difficulty-selector .diff-option.selected {
+    background: var(--primary-gradient);
+    border-color: transparent;
+}
+
+body.dark-theme .fav-btn.active {
+    color: #ffd700;
+}
+
 .glass-header {
     display: flex;
     justify-content: space-between;
@@ -486,4 +590,270 @@ blockquote {
 .delete-text {
     font-size: 0.65rem;
     text-transform: uppercase;
+}
+
+/* ============================================
+   NOUVELLES FONCTIONNALITÉS (v3.0)
+   ============================================ */
+
+/* Theme Toggle */
+#theme-toggle {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+#theme-toggle:hover {
+    background: rgba(138, 43, 226, 0.1);
+}
+
+/* Search Bar */
+.search-bar {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    background: #fff;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-bar:focus {
+    border-color: var(--primary-color);
+}
+
+/* Filter Pills */
+.filter-pills {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.filter-pill.active {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+}
+
+/* Favorite Button */
+.fav-btn {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-muted);
+}
+
+.fav-btn.active {
+    color: #ffd700;
+    transform: scale(1.2);
+}
+
+/* Quiz Section */
+.quiz-container {
+    background: rgba(138, 43, 226, 0.05);
+    border: 1px solid rgba(138, 43, 226, 0.15);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.quiz-question {
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quiz-option {
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.quiz-option:hover {
+    background: rgba(138, 43, 226, 0.05);
+    border-color: var(--primary-color);
+}
+
+.quiz-option.correct {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: #4caf50;
+    color: #2e7d32;
+}
+
+.quiz-option.incorrect {
+    background: rgba(244, 67, 54, 0.1);
+    border-color: #f44336;
+    color: #c62828;
+}
+
+.quiz-result {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.quiz-result.success {
+    background: rgba(76, 175, 80, 0.1);
+    color: #2e7d32;
+}
+
+.quiz-result.error {
+    background: rgba(244, 67, 54, 0.1);
+    color: #c62828;
+}
+
+/* Difficulty Selector */
+.difficulty-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.diff-option {
+    flex: 1;
+    padding: 10px 8px;
+    text-align: center;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.diff-option.selected {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+}
+
+/* RSS Feed Management */
+.rss-feed-list {
+    margin-top: 15px;
+}
+
+.rss-feed-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    word-break: break-all;
+}
+
+.rss-feed-item button {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+}
+
+/* Export Button */
+.export-btn {
+    background: rgba(138, 43, 226, 0.1);
+    border: 1px solid rgba(138, 43, 226, 0.2);
+    color: var(--primary-color);
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.export-btn:hover {
+    background: rgba(138, 43, 226, 0.2);
+}
+
+/* Header Actions Row */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Difficulty Badge */
+.difficulty-badge {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.difficulty-badge.debutant {
+    background: rgba(76, 175, 80, 0.15);
+    color: #2e7d32;
+}
+
+.difficulty-badge.intermédiaire {
+    background: rgba(255, 193, 7, 0.15);
+    color: #f57f17;
+}
+
+.difficulty-badge.avancé {
+    background: rgba(244, 67, 54, 0.15);
+    color: #c62828;
+}
+
+/* Markdown rendered improvements */
+.markdown-content h1 { font-size: 1.6rem; margin: 20px 0 12px; font-weight: 800; }
+.markdown-content h2 { font-size: 1.3rem; margin: 18px 0 10px; font-weight: 700; }
+.markdown-content h3 { font-size: 1.1rem; margin: 14px 0 8px; font-weight: 600; }
+.markdown-content h4 { font-size: 1rem; margin: 12px 0 6px; font-weight: 600; }
+.markdown-content p { margin-bottom: 14px; }
+.markdown-content ul, .markdown-content ol { margin: 10px 0 10px 20px; }
+.markdown-content li { margin-bottom: 6px; }
+.markdown-content strong { font-weight: 700; }
+.markdown-content em { font-style: italic; }
+.markdown-content hr {
+    border: none;
+    height: 1px;
+    background: var(--card-border);
+    margin: 20px 0;
 }
